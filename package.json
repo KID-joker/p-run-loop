@@ -1,0 +1,51 @@
+{
+	"name": "p-next",
+	"type": "module",
+	"version": "0.0.0",
+	"description": "",
+	"author": "KID-joker <kid_joker@126.com>",
+	"license": "MIT",
+	"homepage": "https://github.com/KID-joker/p-next#readme",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/KID-joker/p-next.git"
+	},
+	"bugs": "https://github.com/KID-joker/p-next/issues",
+	"keywords": [],
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"typesVersions": {
+		"*": {
+			"*": [
+				"./dist/*",
+				"./dist/index.d.ts"
+			]
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "unbuild",
+		"dev": "unbuild --stub",
+		"start": "esno src/index.ts",
+		"test": "vitest",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@types/node": "^20.12.8",
+		"esno": "^4.7.0",
+		"typescript": "^5.4.5",
+		"unbuild": "^2.0.0",
+		"vitest": "^1.6.0"
+	}
+}
