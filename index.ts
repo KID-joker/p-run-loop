@@ -1,5 +1,4 @@
 type PromiseResolve<T> = (value?: T | PromiseLike<T>) => void
-
 export type PromiseOnFulfilled<T, TResult> =
   | ((value: T) => TResult | PromiseLike<TResult>)
   | undefined
@@ -17,14 +16,15 @@ type PromiseMethods = 'then' | 'catch' | 'finally'
 interface PromiseCallback {
   property: PromiseMethods
   args: any[]
-  receiver: any
+  thisArgument: any
 }
+
+const proxySet: WeakSet<Function> = new WeakSet()
+const proxyMap: WeakMap<Function, Function> = new WeakMap()
 
 export default class PNext {
   readonly auto: boolean = true
   #queue: PromiseResolve<any>[] = []
-  #proxySet: WeakSet<Function> = new WeakSet()
-  #proxyMap: WeakMap<Function, Function> = new WeakMap()
   #queuing: boolean = false
   #promising: boolean = false
   next?: Function
@@ -43,29 +43,30 @@ export default class PNext {
   }
 
   add(fn: Function) {
-    if (this.#proxySet.has(fn))
+    if (proxySet.has(fn))
       return fn
 
-    let proxyFn = this.#proxyMap.get(fn)
+    let proxyFn = proxyMap.get(fn)
     if (proxyFn)
       return proxyFn
 
     proxyFn = new Proxy(fn, {
-      apply: (target, thisArg, argArray) => {
+      apply: (fnTarget, thisArg, argArray) => {
         if (this.#promising)
-          return Reflect.apply(target, thisArg, argArray)
+          return Reflect.apply(fnTarget, thisArg, argArray)
 
         let promise
         const promiseCallbacks: PromiseCallback[] = []
         if (this.#queuing) {
           promise = new Promise((resolve: PromiseResolve<any>) => {
             this.#queue.push(resolve)
-          }).then(() => Reflect.apply(target, thisArg, argArray))
+          }).then(() => Reflect.apply(fnTarget, thisArg, argArray))
         }
         else {
           this.#queuing = true
-          promise = Promise.resolve(Reflect.apply(target, thisArg, argArray))
+          promise = Promise.resolve(Reflect.apply(fnTarget, thisArg, argArray))
         }
+
         promise
           .then((res) => {
             return this.#createThenable([null, res], promiseCallbacks)
@@ -73,8 +74,9 @@ export default class PNext {
           .catch((err) => {
             return this.#createThenable([err, null], promiseCallbacks)
           })
+
         return new Proxy(promise, {
-          get(target, property, receiver) {
+          get(promiseTarget, property, receiver) {
             if (
               typeof property === 'string'
               && ['then', 'catch', 'finally'].includes(property)
@@ -83,26 +85,26 @@ export default class PNext {
                 promiseCallbacks.push({
                   property: property as PromiseMethods,
                   args,
-                  receiver,
+                  thisArgument: promiseTarget,
                 })
                 return receiver
               }
             }
-            return Reflect.get(target, property, receiver)
+            return Reflect.get(promiseTarget, property, receiver)
           },
         })
       },
     })
-    this.#proxySet.add(proxyFn)
-    this.#proxyMap.set(fn, proxyFn)
+
+    proxySet.add(proxyFn)
+    proxyMap.set(fn, proxyFn)
     return proxyFn
   }
 
   #next() {
     if (this.#queue.length > 0) {
-      const resolve: PromiseResolve<any> | undefined = this.#queue.shift()
-      if (resolve)
-        resolve()
+      const resolve = this.#queue.shift() as PromiseResolve<any>
+      resolve()
     }
     else {
       this.#queuing = false
@@ -111,6 +113,7 @@ export default class PNext {
 
   async #createThenable(result: any[], promiseCallbacks: PromiseCallback[]) {
     this.#promising = true
+
     let value, error
     try {
       value = await this.#createPromise(result, promiseCallbacks)
@@ -120,16 +123,18 @@ export default class PNext {
     }
 
     this.#promising = false
-    this.#next()
+    if (this.auto)
+      this.#next()
 
-    return error ? Promise.reject(value) : Promise.resolve(error)
+    return error ? Promise.reject(error) : Promise.resolve(value)
   }
 
   #createPromise([error, value]: any[], callbacks: PromiseCallback[]) {
     let p = error ? Promise.reject(error) : Promise.resolve(value)
     while (callbacks.length > 0) {
-      const { property, args, receiver } = callbacks.shift() as PromiseCallback
-      p = Reflect.apply(Reflect.get(p, property), receiver, args)
+      const { property, args, thisArgument }
+        = callbacks.shift() as PromiseCallback
+      p = Reflect.apply(Reflect.get(p, property), thisArgument, args)
     }
     return p
   }
