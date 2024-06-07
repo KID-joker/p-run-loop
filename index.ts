@@ -19,14 +19,13 @@ interface PromiseCallback {
   thisArgument: any
 }
 
-const proxySet: WeakSet<Function> = new WeakSet()
-const proxyMap: WeakMap<Function, Function> = new WeakMap()
-
 export default class PNext {
   readonly auto: boolean = true
   #queue: PromiseResolve<any>[] = []
   #queuing: boolean = false
   #promising: boolean = false
+  #proxySet: WeakSet<Function> = new WeakSet()
+  #proxyMap: WeakMap<Function, Function> = new WeakMap()
   next?: Function
   nextAll?: Function
 
@@ -43,10 +42,10 @@ export default class PNext {
   }
 
   add(fn: Function) {
-    if (proxySet.has(fn))
+    if (this.#proxySet.has(fn))
       return fn
 
-    let proxyFn = proxyMap.get(fn)
+    let proxyFn = this.#proxyMap.get(fn)
     if (proxyFn)
       return proxyFn
 
@@ -96,8 +95,8 @@ export default class PNext {
       },
     })
 
-    proxySet.add(proxyFn)
-    proxyMap.set(fn, proxyFn)
+    this.#proxySet.add(proxyFn)
+    this.#proxyMap.set(fn, proxyFn)
     return proxyFn
   }
 
