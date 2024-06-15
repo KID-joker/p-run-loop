@@ -1,16 +1,16 @@
 {
-  "name": "p-next",
+  "name": "p-scheduler",
   "type": "module",
   "version": "0.0.0",
   "description": "",
   "author": "KID-joker <kid_joker@126.com>",
   "license": "MIT",
-  "homepage": "https://github.com/KID-joker/p-next#readme",
+  "homepage": "https://github.com/KID-joker/p-scheduler#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KID-joker/p-next.git"
+    "url": "git+https://github.com/KID-joker/p-scheduler.git"
   },
-  "bugs": "https://github.com/KID-joker/p-next/issues",
+  "bugs": "https://github.com/KID-joker/p-scheduler/issues",
   "keywords": [],
   "sideEffects": false,
   "exports": {
