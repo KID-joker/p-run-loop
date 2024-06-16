@@ -1,7 +1,7 @@
 {
   "name": "p-scheduler",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "author": "KID-joker <kid_joker@126.com>",
   "license": "MIT",
@@ -57,6 +57,6 @@
     "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
-    "*": "eslint --fix"
+    "*.ts,*.js": "eslint --fix"
   }
 }
