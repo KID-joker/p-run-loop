@@ -19,7 +19,7 @@ interface PromiseCallback {
   thisArgument: any
 }
 
-export default class PScheduler {
+export default class PLoop {
   readonly auto: boolean = true
   #queue: PromiseResolve<any>[] = []
   #queuing: boolean = false

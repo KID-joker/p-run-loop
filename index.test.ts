@@ -1,6 +1,6 @@
 import { setTimeout } from 'node:timers/promises'
 import { describe, expect, it, vi } from 'vitest'
-import PScheduler from './index'
+import PLoop from './index'
 
 class Count {
   num = 0
@@ -29,9 +29,9 @@ class Count {
   }
 }
 
-describe('p-scheduler', () => {
+describe('p-loop', () => {
   it('proxy once', () => {
-    const p = new PScheduler()
+    const p = new PLoop()
     const countItem = new Count()
     const _increment = countItem.increment
     countItem.increment = p.add(countItem.increment) as any
@@ -40,15 +40,15 @@ describe('p-scheduler', () => {
   })
 
   it('next exists if auto is false', () => {
-    const p = new PScheduler(false)
-    const p_auto = new PScheduler()
+    const p = new PLoop(false)
+    const p_auto = new PLoop()
 
     expect(p.next).toBeTypeOf('function')
     expect(p_auto.next).toBeUndefined()
   })
 
   it('next manual', async () => {
-    const p = new PScheduler(false)
+    const p = new PLoop(false)
     const countItem = new Count()
     countItem.increment = p.add(countItem.increment) as any
     const getNumSpy = vi.spyOn(countItem, 'getNum')
@@ -71,7 +71,7 @@ describe('p-scheduler', () => {
   })
 
   it('nextAll manual', async () => {
-    const p = new PScheduler(false)
+    const p = new PLoop(false)
     const countItem = new Count()
     countItem.increment = p.add(countItem.increment) as any
     const getNumSpy = vi.spyOn(countItem, 'getNum')
@@ -98,7 +98,7 @@ describe('p-scheduler', () => {
   })
 
   it('next & nextAll', async () => {
-    const p = new PScheduler(false)
+    const p = new PLoop(false)
     const countItem = new Count()
     countItem.increment = p.add(countItem.increment) as any
     const getNumSpy = vi.spyOn(countItem, 'getNum')
@@ -134,8 +134,8 @@ describe('p-scheduler', () => {
   })
 
   it('class scope', async () => {
-    const p1 = new PScheduler(false)
-    const p2 = new PScheduler(false)
+    const p1 = new PLoop(false)
+    const p2 = new PLoop(false)
     const countItem = new Count()
     countItem.increment = p1.add(countItem.increment) as any
     countItem.reset = p2.add(countItem.reset) as any
@@ -154,7 +154,7 @@ describe('p-scheduler', () => {
   })
 
   it('single promise', async () => {
-    const p = new PScheduler()
+    const p = new PLoop()
     const countItem = new Count()
     countItem.increment = p.add(countItem.increment) as any
 
@@ -167,7 +167,7 @@ describe('p-scheduler', () => {
   })
 
   it('multiple promise', async () => {
-    const p = new PScheduler()
+    const p = new PLoop()
     const countItem = new Count()
     countItem.increment = p.add(countItem.increment) as any
     countItem.decrement = p.add(countItem.decrement) as any
