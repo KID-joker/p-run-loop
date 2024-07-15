@@ -4,7 +4,7 @@
 
 ## Installation
 
-```js
+```
 npm install p-scheduler
 ```
 
@@ -14,38 +14,38 @@ npm install p-scheduler
 
 First, import the `p-scheduler` class and create an instance of it. You can pass an optional boolean parameter to the constructor to enable or disable automatic promise resolution.
 
-```js
-import PScheduler from 'p-scheduler';
+```typescript
+import PScheduler from 'p-scheduler'
 
-const scheduler = new PScheduler(); // Auto mode enabled by default
-const manualScheduler = new PScheduler(false); // Auto mode disabled
+const scheduler = new PScheduler() // Auto mode enabled by default
+const manualScheduler = new PScheduler(false) // Auto mode disabled
 ```
 
 ### Adding Asynchronous Functions
 
 To add a function to the scheduler, use the `add` method. This method returns a proxied version of the function that will be executed according to the scheduler's rules.
 
-```js
-const proxiedFunction = scheduler.add(originalFunction);
+```typescript
+const proxiedFunction = scheduler.add(originalFunction)
 ```
 
 ### Auto Mode
 
 In auto mode, promises are resolved automatically in the order they were added. This is the default behavior.
 
-```js
-const scheduler = new PScheduler();
+```typescript
+const scheduler = new PScheduler()
 
 const fn1 = scheduler.add(async () => {
-  console.log('Function 1');
-});
+  console.log('Function 1')
+})
 
 const fn2 = scheduler.add(async () => {
-  console.log('Function 2');
-});
+  console.log('Function 2')
+})
 
-fn1();
-fn2();
+fn1()
+fn2()
 ```
 
 In this example, "Function 1" will always be logged before "Function 2", regardless of the individual execution times of the functions.
@@ -54,32 +54,32 @@ In this example, "Function 1" will always be logged before "Function 2", regardl
 
 In manual mode, you have control over when the next promise in the queue is resolved by calling the next or nextAll methods.
 
-```js
-const scheduler = new PScheduler(false);
+```typescript
+const scheduler = new PScheduler(false)
 
 const fn1 = scheduler.add(async () => {
-  console.log('Function 1');
-});
+  console.log('Function 1')
+})
 
 const fn2 = scheduler.add(async () => {
-  console.log('Function 2');
-});
+  console.log('Function 2')
+})
 
-fn1();
-fn2();
+fn1()
+fn2()
 
 // Manually resolve the next promise in the queue
-scheduler.next(); // Logs: "Function 1"
+scheduler.next() // Logs: "Function 1"
 
 // Resolve all remaining promises in the queue
-scheduler.nextAll(); // Logs: "Function 2"
+scheduler.nextAll() // Logs: "Function 2"
 ```
 
 ## API
 
 ### Constructor
 
-```js
+```
 constructor(auto?: boolean)
 ```
 
@@ -89,7 +89,7 @@ constructor(auto?: boolean)
 
 `add`
 
-```js
+```
 add(fn: Function): Function
 ```
 
@@ -98,7 +98,7 @@ add(fn: Function): Function
 
 `next`
 
-```js
+```
 next(): void
 ```
 
@@ -106,7 +106,7 @@ Resolves the next promise in the queue. Only available when `auto` is set to `fa
 
 `nextAll`
 
-```js
+```
 nextAll(): void
 ```
 
@@ -116,23 +116,23 @@ Resolves all remaining promises in the queue. Only available when `auto` is set 
 
 Here is a complete example demonstrating the usage of `p-scheduler`:
 
-```js
-import PScheduler from 'p-scheduler';
+```typescript
+import PScheduler from 'p-scheduler'
 
-const scheduler = new PScheduler();
+const scheduler = new PScheduler()
 
 const fn1 = scheduler.add(async () => {
-  console.log('Function 1');
-  return 'Result 1';
-});
+  console.log('Function 1')
+  return 'Result 1'
+})
 
 const fn2 = scheduler.add(async () => {
-  console.log('Function 2');
-  return 'Result 2';
-});
+  console.log('Function 2')
+  return 'Result 2'
+})
 
-fn1().then(result => console.log(result));
-fn2().then(result => console.log(result));
+fn1().then(result => console.log(result))
+fn2().then(result => console.log(result))
 ```
 
 Output:
