@@ -1,16 +1,16 @@
 {
-  "name": "p-loop",
+  "name": "p-run-loop",
   "type": "module",
   "version": "0.2.0",
   "description": "",
   "author": "KID-joker <kid_joker@126.com>",
   "license": "MIT",
-  "homepage": "https://github.com/KID-joker/p-loop#readme",
+  "homepage": "https://github.com/KID-joker/p-run-loop#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KID-joker/p-loop.git"
+    "url": "git+https://github.com/KID-joker/p-run-loop.git"
   },
-  "bugs": "https://github.com/KID-joker/p-loop/issues",
+  "bugs": "https://github.com/KID-joker/p-run-loop/issues",
   "keywords": ["promise", "loop"],
   "sideEffects": false,
   "exports": {

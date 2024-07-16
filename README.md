@@ -1,21 +1,21 @@
-# p-loop
+# p-run-loop
 
-`p-loop` providing a controlled way to manage the execution order of promises. It leverages proxies to queue and manage promises, making it easier to handle asynchronous operations sequentially, especially asynchronous third-party dependencies.
+`p-run-loop` providing a controlled way to manage the execution order of promises. It leverages proxies to queue and manage promises, making it easier to handle asynchronous operations sequentially, especially asynchronous third-party dependencies.
 
 ## Installation
 
 ```
-npm install p-loop
+npm install p-run-loop
 ```
 
 ## Usage
 
 ### Importing and Initializing
 
-First, import the `p-loop` class and create an instance of it. You can pass an optional boolean parameter to the constructor to enable or disable automatic promise resolution.
+First, import the `p-run-loop` class and create an instance of it. You can pass an optional boolean parameter to the constructor to enable or disable automatic promise resolution.
 
 ```js
-import PLoop from 'p-loop'
+import PLoop from 'p-run-loop'
 
 const loop = new PLoop() // Auto mode enabled by default
 const manualLoop = new PLoop(false) // Auto mode disabled
@@ -114,10 +114,10 @@ Resolves all remaining promises in the queue. Only available when `auto` is set 
 
 ## Example
 
-Here is a complete example demonstrating the usage of `p-loop`:
+Here is a complete example demonstrating the usage of `p-run-loop`:
 
 ```js
-import PLoop from 'p-loop'
+import PLoop from 'p-run-loop'
 
 const loop = new PLoop()
 

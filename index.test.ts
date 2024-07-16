@@ -23,7 +23,7 @@ class Count {
   }
 }
 
-describe('p-loop', () => {
+describe('p-run-loop', () => {
   it('proxy once', () => {
     const loop = new PLoop()
     const countItem = new Count()
