@@ -26,11 +26,11 @@ class Count {
 describe('p-run-loop', () => {
   it('proxy once', () => {
     const loop = new PLoop()
-    const countItem = new Count()
-    const _increment = countItem.increment
-    countItem.increment = loop.add(countItem.increment) as any
-    expect(countItem.increment).toBe(loop.add(_increment))
-    expect(countItem.increment).toBe(loop.add(countItem.increment))
+    const counter = new Count()
+    const _increment = counter.increment
+    counter.increment = loop.add(counter.increment) as any
+    expect(counter.increment).toBe(loop.add(_increment))
+    expect(counter.increment).toBe(loop.add(counter.increment))
   })
 
   it('next exists if auto is false', () => {
@@ -43,16 +43,16 @@ describe('p-run-loop', () => {
 
   it('next manual', async () => {
     const loop = new PLoop(false)
-    const countItem = new Count()
-    countItem.increment = loop.add(countItem.increment) as any
-    const getNumSpy = vi.spyOn(countItem, 'getNum')
+    const counter = new Count()
+    counter.increment = loop.add(counter.increment) as any
+    const getNumSpy = vi.spyOn(counter, 'getNum')
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(1)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(1)
     })
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(2)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(2)
     })
 
     await setTimeout(100)
@@ -66,20 +66,20 @@ describe('p-run-loop', () => {
 
   it('nextAll manual', async () => {
     const loop = new PLoop(false)
-    const countItem = new Count()
-    countItem.increment = loop.add(countItem.increment) as any
-    const getNumSpy = vi.spyOn(countItem, 'getNum')
+    const counter = new Count()
+    counter.increment = loop.add(counter.increment) as any
+    const getNumSpy = vi.spyOn(counter, 'getNum')
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(1)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(1)
     })
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(3)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(3)
     })
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(3)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(3)
     })
 
     await setTimeout(100)
@@ -93,24 +93,24 @@ describe('p-run-loop', () => {
 
   it('next & nextAll', async () => {
     const loop = new PLoop(false)
-    const countItem = new Count()
-    countItem.increment = loop.add(countItem.increment) as any
-    const getNumSpy = vi.spyOn(countItem, 'getNum')
+    const counter = new Count()
+    counter.increment = loop.add(counter.increment) as any
+    const getNumSpy = vi.spyOn(counter, 'getNum')
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(1)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(1)
     })
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(2)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(2)
     })
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(4)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(4)
     })
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(4)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(4)
     })
 
     await setTimeout(100)
@@ -130,17 +130,17 @@ describe('p-run-loop', () => {
   it('class scope', async () => {
     const loop1 = new PLoop(false)
     const loop2 = new PLoop(false)
-    const countItem = new Count()
-    countItem.increment = loop1.add(countItem.increment) as any
-    countItem.reset = loop2.add(countItem.reset) as any
-    const getNumSpy = vi.spyOn(countItem, 'getNum')
+    const counter = new Count()
+    counter.increment = loop1.add(counter.increment) as any
+    counter.reset = loop2.add(counter.reset) as any
+    const getNumSpy = vi.spyOn(counter, 'getNum')
 
-    countItem.increment().then(async () => {
-      expect(await countItem.getNum()).toBe(0)
+    counter.increment().then(async () => {
+      expect(await counter.getNum()).toBe(0)
     })
 
-    countItem.reset().then(async () => {
-      expect(await countItem.getNum()).toBe(0)
+    counter.reset().then(async () => {
+      expect(await counter.getNum()).toBe(0)
     })
 
     await setTimeout(100)
@@ -149,50 +149,64 @@ describe('p-run-loop', () => {
 
   it('single promise', async () => {
     const loop = new PLoop()
-    const countItem = new Count()
-    countItem.increment = loop.add(countItem.increment) as any
+    const counter = new Count()
+    counter.increment = loop.add(counter.increment) as any
 
-    countItem.increment().then((res) => {
+    counter.increment().then((res) => {
       expect(res).toBe(1)
     })
 
-    await countItem.increment()
-    expect(await countItem.getNum()).toBe(2)
+    await counter.increment()
+    expect(await counter.getNum()).toBe(2)
   })
 
   it('multiple promise', async () => {
     const loop = new PLoop()
-    const countItem = new Count()
-    countItem.increment = loop.add(countItem.increment) as any
-    countItem.getNum = loop.add(countItem.getNum) as any
+    const counter = new Count()
+    counter.increment = loop.add(counter.increment) as any
+    counter.getNum = loop.add(counter.getNum) as any
 
     // first
-    countItem.increment().then((res) => {
+    counter.increment().then((res) => {
       expect(res).toBe(1)
 
-      // fourth
-      countItem.increment().then(async (res) => {
-        expect(res).toBe(4)
-        // sixth
-        const num = await countItem.getNum()
-        expect(num).toBe(4)
+      // second
+      counter.increment().then(async (res) => {
+        expect(res).toBe(2)
+
+        // third
+        await counter.increment()
+
+        // fourth
+        const num = await counter.getNum()
+        expect(num).toBe(3)
       })
     })
 
-    // second
-    countItem.increment().then((res) => {
-      expect(res).toBe(2)
+    // fifth
+    counter.increment().then(async (res) => {
+      expect(res).toBe(4)
+
+      // sixth
+      await counter.increment()
+
+      // seventh
+      const num = await counter.getNum()
+      expect(num).toBe(5)
+
+      return num
+    }).then((res) => {
+      // eighth
+      expect(res).toBe(5)
     })
 
-    // third
-    await countItem.increment()
+    // ninth
+    expect(await counter.getNum()).toBe(5)
 
-    // fifth
-    expect(await countItem.getNum()).toBe(4)
-
-    // seventh
-    countItem.increment().then((res) => {
-      expect(res).toBe(5)
+    // tenth
+    await counter.reset()
+    counter.getNum().then((res) => {
+      expect(res).toBe(0)
     })
   })
 })

@@ -1,9 +1,14 @@
 type PromiseResolve<T> = (value?: T | PromiseLike<T>) => void
 
+function isSymbol(val: unknown): val is symbol {
+  return typeof val === 'symbol'
+}
+
 export default class PLoop {
   readonly auto: boolean = true
   #queue: PromiseResolve<any>[] = []
   #queuing: boolean = false
+  #promising: boolean = false
   #proxySet: WeakSet<Function> = new WeakSet()
   #proxyMap: WeakMap<Function, Function> = new WeakMap()
   next?: Function
@@ -30,7 +35,10 @@ export default class PLoop {
       return proxyFn
 
     proxyFn = new Proxy(fn, {
-      apply: (fnTarget, thisArg, argArray) => {
+      apply: async (fnTarget, thisArg, argArray) => {
+        if (this.#promising)
+          return await Reflect.apply(fnTarget, thisArg, argArray)
+
         let promise
         if (this.#queuing) {
           promise = new Promise((resolve: PromiseResolve<any>) => {
@@ -50,7 +58,7 @@ export default class PLoop {
           })
         }
 
-        return promise
+        return this.#proxyPromise(promise)
       },
     })
 
@@ -60,6 +68,8 @@ export default class PLoop {
   }
 
   #next() {
+    this.#promising = false
+
     if (this.#queue.length > 0) {
       const resolve = this.#queue.shift() as PromiseResolve<any>
       resolve()
@@ -67,5 +77,26 @@ export default class PLoop {
     else {
       this.#queuing = false
     }
+  }
+
+  #proxyPromise(promise: Promise<any>) {
+    return new Proxy(promise, {
+      get: (target, p, receiver) => {
+        const thenable = Reflect.get(target, p, receiver)
+        if (isSymbol(p) || !['then', 'catch', 'finally'].includes(p))
+          return thenable
+
+        return (...args: Function[]) => {
+          return this.#proxyPromise(Reflect.apply(thenable, target, args.map((fn) => {
+            return new Proxy(fn, {
+              apply: async (fnTarget, thisArg, argArray) => {
+                this.#promising = true
+                return await Reflect.apply(fnTarget, thisArg, argArray)
+              },
+            })
+          })))
+        }
+      },
+    })
   }
 }
